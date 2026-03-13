@@ -1,0 +1,418 @@
+@page
+@model WebApplication1.Pages.Assets.IndexModel
+@using WebApplication1.Models
+@{
+    ViewData["Title"] = "เลือกซื้อทรัพย์";
+}
+
+<div class="container-xl">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="page-title"><i class="bi bi-collection me-2"></i>เลือกซื้อทรัพย์</h2>
+                <p class="page-subtitle">
+                    พบทรัพย์ <strong class="text-primary">@Model.TotalCount</strong> รายการ
+                    @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                    { <span>สำหรับ "<em>@Model.SearchTerm</em>"</span> }
+                </p>
+            </div>
+            <form method="get" class="search-form">
+                <div class="input-group">
+                    <input type="text" name="SearchTerm" value="@Model.SearchTerm"
+                           class="form-control" placeholder="ค้นหารหัส / จังหวัด / ประเภท..." />
+                    <input type="hidden" name="FilterType"     value="@Model.FilterType" />
+                    <input type="hidden" name="FilterProvince" value="@Model.FilterProvince" />
+                    <input type="hidden" name="FilterStatus"   value="@Model.FilterStatus" />
+                    <input type="hidden" name="SortBy"         value="@Model.SortBy" />
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- ── Filter Sidebar ── -->
+        <div class="col-lg-3 col-md-4">
+            <div class="filter-panel" style="position: sticky; top: 80px;">
+                <form method="get" id="filterForm">
+                    <input type="hidden" name="SearchTerm" value="@Model.SearchTerm" />
+                    <input type="hidden" name="SortBy"     value="@Model.SortBy" />
+                    <input type="hidden" name="PageNumber" value="1" />
+
+                    <div class="filter-section">
+                        <span class="filter-title"><i class="bi bi-funnel me-1"></i>กรองข้อมูล</span>
+                    </div>
+
+                    <!-- Asset Type -->
+                    <div class="filter-section">
+                        <div class="filter-section-title">ประเภททรัพย์</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="FilterType" value=""
+                                       @(string.IsNullOrEmpty(Model.FilterType) ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <span>ทั้งหมด</span>
+                            </label>
+                            @foreach (var type in Model.AssetTypes)
+                            {
+                                <label class="filter-option">
+                                    <input type="radio" name="FilterType" value="@type"
+                                           @(Model.FilterType == type ? "checked" : "")
+                                           onchange="this.form.submit()" />
+                                    <span>@type</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Province -->
+                    <div class="filter-section">
+                        <div class="filter-section-title">จังหวัด</div>
+                        <select name="FilterProvince" class="form-select form-select-sm"
+                                onchange="this.form.submit()">
+                            <option value="">ทั้งหมด</option>
+                            @foreach (var prov in Model.Provinces)
+                            {
+                                if (Model.FilterProvince == prov)
+                                {
+                                    <option value="@prov" selected>@prov</option>
+                                }
+                                else
+                                {
+                                    <option value="@prov">@prov</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="filter-section">
+                        <div class="filter-section-title">สถานะ</div>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="FilterStatus" value=""
+                                       @(string.IsNullOrEmpty(Model.FilterStatus) ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <span>ทั้งหมด</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="FilterStatus" value="available"
+                                       @(Model.FilterStatus == "available" ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <span style="color:#2E7D32">● ว่าง</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="FilterStatus" value="reserved"
+                                       @(Model.FilterStatus == "reserved" ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <span style="color:#E65100">● จอง</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="FilterStatus" value="sold"
+                                       @(Model.FilterStatus == "sold" ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                <span style="color:#607080">● ขายแล้ว</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Clear filters -->
+                    @if (!string.IsNullOrEmpty(Model.FilterType) || !string.IsNullOrEmpty(Model.FilterProvince) || !string.IsNullOrEmpty(Model.FilterStatus))
+                    {
+                        <div class="filter-section">
+                            <a asp-page="/Assets/Index"
+                               asp-route-SearchTerm="@Model.SearchTerm"
+                               asp-route-SortBy="@Model.SortBy"
+                               class="btn btn-outline-secondary btn-sm w-100">
+                                <i class="bi bi-x-circle me-1"></i>ล้างตัวกรอง
+                            </a>
+                        </div>
+                    }
+                </form>
+            </div>
+        </div>
+
+        <!-- ── Asset Grid ── -->
+        <div class="col-lg-9 col-md-8">
+
+            <!-- Sort / Info bar -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <span class="text-muted" style="font-size:13px">
+                    @if (Model.TotalCount > 0)
+                    {
+                        <span>
+                            แสดง @(((Model.PageNumber - 1) * 24) + 1)–@(Math.Min(Model.PageNumber * 24, Model.TotalCount))
+                            จาก @Model.TotalCount รายการ
+                        </span>
+                        if (Model.TotalPages > 1)
+                        {
+                            <span class="ms-1">(หน้า @Model.PageNumber / @Model.TotalPages)</span>
+                        }
+                    }
+                </span>
+                <form method="get" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="SearchTerm"     value="@Model.SearchTerm" />
+                    <input type="hidden" name="FilterType"     value="@Model.FilterType" />
+                    <input type="hidden" name="FilterProvince" value="@Model.FilterProvince" />
+                    <input type="hidden" name="FilterStatus"   value="@Model.FilterStatus" />
+                    <input type="hidden" name="PageNumber"     value="1" />
+                    <label class="text-muted" style="font-size:13px;white-space:nowrap">เรียงโดย:</label>
+                    <select name="SortBy" class="form-select form-select-sm" onchange="this.form.submit()" style="width:auto">
+                        @{ var sb = Model.SortBy; }
+                        @if (sb == "default")    { <option value="default"    selected>ค่าเริ่มต้น</option> }    else { <option value="default">ค่าเริ่มต้น</option> }
+                        @if (sb == "price_asc")  { <option value="price_asc"  selected>ราคา: ต่ำ → สูง</option> } else { <option value="price_asc">ราคา: ต่ำ → สูง</option> }
+                        @if (sb == "price_desc") { <option value="price_desc" selected>ราคา: สูง → ต่ำ</option> } else { <option value="price_desc">ราคา: สูง → ต่ำ</option> }
+                        @if (sb == "code_asc")   { <option value="code_asc"   selected>รหัสทรัพย์</option> }     else { <option value="code_asc">รหัสทรัพย์</option> }
+                        @if (sb == "newest")     { <option value="newest"     selected>ล่าสุด</option> }         else { <option value="newest">ล่าสุด</option> }
+                    </select>
+                </form>
+            </div>
+
+            <!-- Cards -->
+            @if (Model.Assets.Count == 0)
+            {
+                <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <h5>ไม่พบทรัพย์ที่ค้นหา</h5>
+                    <p>ลองปรับเงื่อนไขการค้นหาหรือตัวกรอง</p>
+                    <a asp-page="/Assets/Index" class="btn btn-primary mt-2">ดูทรัพย์ทั้งหมด</a>
+                </div>
+            }
+            else
+            {
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-3 g-3">
+                    @foreach (var asset in Model.Assets)
+                    {
+                        <div class="col">
+                            <div class="asset-card">
+                                <!-- Color header -->
+                                <div class="asset-card-header @asset.TypeCssClass">
+                                    <span class="asset-code-badge">@asset.AssetCode</span>
+                                    <span class="asset-status-badge @asset.StatusBadgeClass">@asset.StatusText</span>
+                                </div>
+                                <!-- Body -->
+                                <div class="asset-card-body">
+                                    <div class="asset-type-row">
+                                        <i class="bi @asset.TypeIcon"></i>
+                                        <span>@asset.AssetType</span>
+                                    </div>
+                                    <div class="asset-title-deed">@asset.TitleDeedType</div>
+                                    <div class="asset-location">
+                                        <i class="bi bi-geo-alt"></i>
+                                        <span>@asset.District, @asset.Province</span>
+                                    </div>
+                                    <div class="asset-area">
+                                        <i class="bi bi-rulers"></i>
+                                        <span>@asset.AreaText</span>
+                                    </div>
+                                    <div class="asset-price-section">
+                                        <div class="asset-appraised-price">ราคาประเมิน ฿@asset.AppraisedPrice.ToString("N0")</div>
+                                        <div class="asset-selling-price">฿ @asset.SellingPrice.ToString("N0")</div>
+                                    </div>
+                                    @if (asset.Status == AssetStatus.Available)
+                                    {
+                                        <button type="button" class="btn-book"
+                                                onclick="openBookingModal(@asset.Id,'@asset.AssetCode','@asset.AssetType','@asset.District, @asset.Province',@asset.SellingPrice)">
+                                            <i class="bi bi-bookmark-plus me-1"></i>จองซื้อ
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-sm w-100 mt-2" disabled style="border-radius:8px">
+                                            <i class="bi bi-bookmark-x me-1"></i>@asset.StatusText
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+
+            <!-- Pagination -->
+            @{
+                var startPg = Math.Max(1, Model.PageNumber - 2);
+                var endPg   = Math.Min(Model.TotalPages, Model.PageNumber + 2);
+            }
+            @if (Model.TotalPages > 1)
+            {
+                <nav class="mt-4" aria-label="pagination">
+                    <ul class="pagination pagination-modern justify-content-center flex-wrap gap-1">
+                        @if (Model.PageNumber > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/Assets/Index"
+                                   asp-route-PageNumber="1"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy" title="หน้าแรก">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/Assets/Index"
+                                   asp-route-PageNumber="@(Model.PageNumber - 1)"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+
+                        @if (startPg > 1)
+                        {
+                            <li class="page-item @(1 == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-page="/Assets/Index" asp-route-PageNumber="1"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy">1</a>
+                            </li>
+                            @if (startPg > 2)
+                            {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            }
+                        }
+
+                        @for (int p = startPg; p <= endPg; p++)
+                        {
+                            <li class="page-item @(p == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-page="/Assets/Index" asp-route-PageNumber="@p"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy">@p</a>
+                            </li>
+                        }
+
+                        @if (endPg < Model.TotalPages)
+                        {
+                            @if (endPg < Model.TotalPages - 1)
+                            {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            }
+                            <li class="page-item @(Model.TotalPages == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" asp-page="/Assets/Index" asp-route-PageNumber="@Model.TotalPages"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy">@Model.TotalPages</a>
+                            </li>
+                        }
+
+                        @if (Model.PageNumber < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/Assets/Index"
+                                   asp-route-PageNumber="@(Model.PageNumber + 1)"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" asp-page="/Assets/Index"
+                                   asp-route-PageNumber="@Model.TotalPages"
+                                   asp-route-SearchTerm="@Model.SearchTerm" asp-route-FilterType="@Model.FilterType"
+                                   asp-route-FilterProvince="@Model.FilterProvince" asp-route-FilterStatus="@Model.FilterStatus"
+                                   asp-route-SortBy="@Model.SortBy" title="หน้าสุดท้าย">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ── Booking Modal ── -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header booking-modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">
+                    <i class="bi bi-bookmark-plus me-2"></i>จองซื้อทรัพย์
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="Book">
+                <div class="modal-body p-4">
+                    <!-- Asset preview -->
+                    <div class="booking-asset-preview mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="booking-asset-icon">
+                                <i class="bi bi-house-door fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold fs-6" id="modalAssetCode">-</div>
+                                <div class="text-muted small" id="modalAssetType">-</div>
+                                <div class="text-muted small" id="modalAssetLocation">-</div>
+                                <div class="fw-bold mt-1" style="color:var(--primary);font-size:1.15rem" id="modalAssetPrice">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="BookAssetId" id="bookAssetId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" asp-for="CustomerName"
+                               placeholder="กรอกชื่อ-นามสกุล" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" asp-for="CustomerPhone"
+                               placeholder="0xx-xxx-xxxx" required />
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label">เลขบัตรประชาชน <span class="text-muted fw-normal">(ไม่บังคับ)</span></label>
+                        <input type="text" class="form-control" asp-for="CustomerIdCard"
+                               placeholder="x-xxxx-xxxxx-xx-x" maxlength="17" />
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-bookmark-check me-1"></i>ยืนยันการจอง
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openBookingModal(assetId, assetCode, assetType, location, price) {
+            document.getElementById('bookAssetId').value = assetId;
+            document.getElementById('modalAssetCode').textContent = assetCode;
+            document.getElementById('modalAssetType').textContent = assetType;
+            document.getElementById('modalAssetLocation').textContent = location;
+            document.getElementById('modalAssetPrice').textContent =
+                '฿ ' + Number(price).toLocaleString('th-TH');
+            document.querySelector('[name="CustomerName"]').value = '';
+            document.querySelector('[name="CustomerPhone"]').value = '';
+            document.querySelector('[name="CustomerIdCard"]').value = '';
+            new bootstrap.Modal(document.getElementById('bookingModal')).show();
+        }
+    </script>
+}

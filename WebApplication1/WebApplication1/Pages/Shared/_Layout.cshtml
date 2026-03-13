@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ระบบจองซื้อทรัพย์</title>
+    <link rel="stylesheet" href="~/lib/sarabun/sarabun.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm main-navbar">
+            <div class="container-xl">
+                <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <span class="brand-icon"><i class="bi bi-bank2"></i></span>
+                    ระบบจองซื้อทรัพย์
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" asp-area="" asp-page="/Assets/Index">
+                                <i class="bi bi-collection me-1"></i>เลือกซื้อทรัพย์
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom" asp-area="" asp-page="/MyBookings/Index">
+                                <i class="bi bi-bookmark-check me-1"></i>ทรัพย์ที่ลงทะเบียน
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <main role="main" class="pb-5">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container-xl">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><i class="bi bi-bank2 me-1"></i> ระบบจองซื้อทรัพย์ &copy; @DateTime.Now.Year</span>
+                <span class="text-muted small">ข้อมูลทรัพย์ทั้งหมดเป็นข้อมูลตัวอย่าง</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

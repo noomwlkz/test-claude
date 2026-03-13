@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet build 2>&1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5242/ 2>&1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5242/Assets 2>&1 && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5242/MyBookings 2>&1)",
+      "Bash(pkill -f \"dotnet run\" 2>/dev/null; pkill -f \"WebApplication1.dll\" 2>/dev/null; echo \"done\")",
+      "Bash(netstat -ano | grep :5242 2>/dev/null || netstat -ano | findstr :5242 2>/dev/null)",
+      "Bash(taskkill /PID 12916 /F 2>&1)",
+      "Bash(cmd /c \"taskkill /PID 12916 /F\" 2>&1)",
+      "Bash(netstat -ano 2>/dev/null | grep :5242 || echo \"port 5242 is now free\")",
+      "Bash(cmd /c \"taskkill /PID 12916 /F 2>&1\")",
+      "Bash(cmd /c \"taskkill /PID 12916 /F\" 2>&1; sleep 1; netstat -ano | grep :5242 || echo \"free\")",
+      "Bash(cmd /c \"taskkill /F /IM WebApplication1.exe 2>&1 & taskkill /F /IM dotnet.exe 2>&1\")",
+      "Bash(sleep 2 && netstat -ano 2>/dev/null | grep \":5242\" || echo \"port 5242 is free\")",
+      "Bash(cmd /c \"wmic process where ProcessId=12916 get Name\" 2>&1 | cat)",
+      "Bash(powershell -Command \"Stop-Process -Id 12916 -Force -ErrorAction SilentlyContinue; Write-Host 'done'\")",
+      "Bash(sleep 1 && netstat -ano 2>/dev/null | grep \":5242\\\\|:5100\" || echo \"ports are free\")",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet build 2>&1 | tail -5)",
+      "Bash(node --version 2>&1 && npm --version 2>&1)",
+      "Bash(mkdir -p /tmp/npm-assets)",
+      "Read(//tmp/**)",
+      "Bash(npm install:*)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet build 2>&1 | tail -4)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet add package Microsoft.EntityFrameworkCore.SqlServer && dotnet add package Microsoft.EntityFrameworkCore.Tools 2>&1 | tail -6)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 8.0.13 && dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.13 2>&1 | tail -5)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet tool install --global dotnet-ef --version 8.0.13 2>&1 | tail -3)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet ef dbcontext scaffold \"Server=172.19.22.98,2433;Database=NPAU2_rev2;User Id=LSV;Password=P@ssW0rd;TrustServerCertificate=True;\" Microsoft.EntityFrameworkCore.SqlServer --output-dir Data/Entities --context-dir Data --context AppDbContext --no-onconfiguring --force 2>&1)",
+      "Bash(ls \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1/Data/Entities/\" | grep -i \"^B[A-Z].*[^s]$\\\\|BCare\\\\|BLand\\\\|BProv\\\\|BAmph\" | head -20 && echo \"---\" && grep \"province\\\\|amphur\\\\|province_code\\\\|amphur_code\" \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1/Data/AppDbContext.cs\" | grep \"ToTable\\\\|HasColumnName.*rovince\" | head -10)",
+      "Bash(cd \"D:/_LSV_Project/Test/Test claude/WebApplication1/WebApplication1\" && dotnet ef dbcontext scaffold \\\\\n  \"Server=172.19.22.98,2433;Database=NPAU2_rev2;User Id=LSV;Password=P@ssW0rd;TrustServerCertificate=True;\" \\\\\n  Microsoft.EntityFrameworkCore.SqlServer \\\\\n  --output-dir Data/Entities \\\\\n  --context-dir Data \\\\\n  --context AppDbContext \\\\\n  --schema auction \\\\\n  --no-onconfiguring \\\\\n  --force 2>&1)"
+    ]
+  }
+}

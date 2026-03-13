@@ -1,0 +1,195 @@
+@page
+@model WebApplication1.Pages.MyBookings.IndexModel
+@using WebApplication1.Models
+@{
+    ViewData["Title"] = "ทรัพย์ที่ลงทะเบียน";
+}
+
+<div class="container-xl">
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h2 class="page-title"><i class="bi bi-bookmark-check me-2"></i>ทรัพย์ที่ลงทะเบียน</h2>
+                <p class="page-subtitle">รายการจองซื้อทรัพย์ทั้งหมดของคุณ</p>
+            </div>
+            <a asp-page="/Assets/Index" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>จองทรัพย์เพิ่ม
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue"><i class="bi bi-bookmark"></i></div>
+                <div>
+                    <div class="stat-value">@Model.TotalCount</div>
+                    <div class="stat-label">การจองทั้งหมด</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green"><i class="bi bi-bookmark-check"></i></div>
+                <div>
+                    <div class="stat-value">@Model.ConfirmedCount</div>
+                    <div class="stat-label">ยืนยันแล้ว</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-gray"><i class="bi bi-bookmark-x"></i></div>
+                <div>
+                    <div class="stat-value">@Model.CancelledCount</div>
+                    <div class="stat-label">ยกเลิก</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    @if (Model.Bookings.Count == 0)
+    {
+        <div class="empty-state" style="background:white;border-radius:14px;box-shadow:var(--shadow)">
+            <i class="bi bi-bookmark"></i>
+            <h5>ยังไม่มีการจองทรัพย์</h5>
+            <p>เริ่มต้นจองซื้อทรัพย์ได้เลย</p>
+            <a asp-page="/Assets/Index" class="btn btn-primary mt-2">
+                <i class="bi bi-collection me-1"></i>เลือกซื้อทรัพย์
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden">
+            <div class="table-responsive">
+                <table class="table booking-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>เลขที่การจอง</th>
+                            <th>รหัสทรัพย์</th>
+                            <th>ประเภท</th>
+                            <th>ที่ตั้ง</th>
+                            <th class="text-end">ราคาขาย</th>
+                            <th>ชื่อผู้จอง</th>
+                            <th>วันที่จอง</th>
+                            <th>สถานะ</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in Model.Bookings.OrderByDescending(x => x.BookedAt))
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary" style="font-size:13px">@b.BookingNo</span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold" style="font-size:13px">@b.Asset?.AssetCode</span>
+                                </td>
+                                <td>
+                                    @if (b.Asset != null)
+                                    {
+                                        <span><i class="bi @b.Asset.TypeIcon me-1 text-muted"></i>@b.Asset.AssetType</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (b.Asset != null)
+                                    {
+                                        <span class="text-muted" style="font-size:13px">
+                                            <i class="bi bi-geo-alt me-1"></i>@b.Asset.District, @b.Asset.Province
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold" style="color:var(--primary)">
+                                        ฿ @b.Asset?.SellingPrice.ToString("N0")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold" style="font-size:13px">@b.CustomerName</div>
+                                    <div class="text-muted" style="font-size:12px">@b.CustomerPhone</div>
+                                </td>
+                                <td>
+                                    <span style="font-size:13px">@b.BookedAt.ToString("dd/MM/yyyy")</span>
+                                    <div class="text-muted" style="font-size:11px">@b.BookedAt.ToString("HH:mm น.")</div>
+                                </td>
+                                <td>
+                                    <span class="badge @b.StatusBadgeClass" style="font-size:11px;padding:5px 10px;border-radius:20px">
+                                        @b.StatusText
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (b.Status == BookingStatus.Confirmed)
+                                    {
+                                        <button type="button" class="btn btn-outline-danger btn-sm"
+                                                onclick="confirmCancel(@b.Id, '@b.BookingNo')"
+                                                style="font-size:12px;border-radius:8px">
+                                            <i class="bi bi-x-circle me-1"></i>ยกเลิก
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Cancel confirm modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#FFF3E0;border:none">
+                <h6 class="modal-title fw-bold" style="color:#E65100">
+                    <i class="bi bi-exclamation-triangle me-2"></i>ยืนยันการยกเลิก
+                </h6>
+            </div>
+            <div class="modal-body text-center py-4">
+                <p class="mb-1">ต้องการยกเลิกการจอง</p>
+                <p class="fw-bold" id="cancelBookingNo" style="color:var(--primary)">-</p>
+                <p class="text-muted small mb-0">ทรัพย์จะกลับสู่สถานะว่างทันที</p>
+            </div>
+            <form method="post" asp-page-handler="Cancel">
+                <input type="hidden" name="bookingId" id="cancelBookingId" value="0" />
+                <div class="modal-footer border-0 pt-0 justify-content-center gap-2">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">ไม่ยกเลิก</button>
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-x-circle me-1"></i>ยืนยันยกเลิก
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmCancel(bookingId, bookingNo) {
+            document.getElementById('cancelBookingId').value = bookingId;
+            document.getElementById('cancelBookingNo').textContent = bookingNo;
+            new bootstrap.Modal(document.getElementById('cancelModal')).show();
+        }
+    </script>
+}

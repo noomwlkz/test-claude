@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|d:\\_lsv_project\\test\\test claude\\webapplication1\\webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|d:\\_lsv_project\\test\\test claude\\webapplication1\\webapplication1\\pages\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\pages\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|d:\\_lsv_project\\test\\test claude\\webapplication1\\webapplication1\\pages\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{5FF7C630-4F70-42C1-A7DC-0EBD8FF37F5F}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\pages\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Pages\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Pages\\_ViewStart.cshtml",
+              "ToolTip": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Pages\\_ViewStart.cshtml",
+              "RelativeToolTip": "WebApplication1\\Pages\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-13T04:36:06.575Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Pages\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Pages\\_ViewImports.cshtml",
+              "ToolTip": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Pages\\_ViewImports.cshtml",
+              "RelativeToolTip": "WebApplication1\\Pages\\_ViewImports.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-03-13T04:36:04.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Program.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
+              "ToolTip": "D:\\_LSV_Project\\Test\\Test claude\\WebApplication1\\WebApplication1\\Program.cs",
+              "RelativeToolTip": "WebApplication1\\Program.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAewBwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-13T04:20:56.559Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
