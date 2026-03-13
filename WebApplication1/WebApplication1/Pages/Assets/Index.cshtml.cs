@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Models;
-using WebApplication1.Services;
 
 namespace WebApplication1.Pages.Assets;
 
 public class IndexModel : PageModel
 {
-    private readonly AssetService _assetService;
+    private readonly AppDbContext _db;
 
-    public IndexModel(AssetService assetService) => _assetService = assetService;
+    public IndexModel(AppDbContext db) => _db = db;
 
     [BindProperty(SupportsGet = true)] public string? SearchTerm      { get; set; }
     [BindProperty(SupportsGet = true)] public string? FilterType      { get; set; }
@@ -26,50 +27,90 @@ public class IndexModel : PageModel
     public List<string> Provinces  { get; set; } = new();
     public List<string> AssetTypes { get; set; } = new();
 
-    // Booking form fields
-    [BindProperty] public int     BookAssetId    { get; set; }
-    [BindProperty] public string  CustomerName   { get; set; } = string.Empty;
-    [BindProperty] public string  CustomerPhone  { get; set; } = string.Empty;
-    [BindProperty] public string? CustomerIdCard { get; set; }
-
-    public void OnGet() => LoadData();
-
-    private void LoadData()
+    public async Task<IActionResult> OnGetAsync()
     {
-        AssetStatus? status = FilterStatus switch
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("CustKey")))
+            return RedirectToPage("/Login/Index");
+
+        var q = _db.AssetMasters.AsNoTracking().AsQueryable();
+
+        // Search
+        if (!string.IsNullOrWhiteSpace(SearchTerm))
         {
-            "available" => AssetStatus.Available,
-            "reserved"  => AssetStatus.Reserved,
-            "sold"      => AssetStatus.Sold,
-            _           => null
+            var t = SearchTerm.Trim();
+            q = q.Where(a => (a.AssetNo != null && a.AssetNo.Contains(t))
+                          || (a.AssetName != null && a.AssetName.Contains(t))
+                          || (a.Province  != null && a.Province.Contains(t))
+                          || (a.District  != null && a.District.Contains(t))
+                          || (a.AssetType != null && a.AssetType.Contains(t)));
+        }
+
+        // Filters
+        if (!string.IsNullOrWhiteSpace(FilterType))     q = q.Where(a => a.AssetType == FilterType);
+        if (!string.IsNullOrWhiteSpace(FilterProvince)) q = q.Where(a => a.Province  == FilterProvince);
+        if (!string.IsNullOrWhiteSpace(FilterStatus))
+        {
+            var flg = FilterStatus switch
+            {
+                "available" => "A",
+                "locked"    => "L",
+                "sold"      => "S",
+                _           => null
+            };
+            if (flg != null) q = q.Where(a => a.StatusFlg == flg);
+        }
+
+        // Sort
+        q = SortBy switch
+        {
+            "price_asc"  => q.OrderBy(a => a.Price),
+            "price_desc" => q.OrderByDescending(a => a.Price),
+            "code_asc"   => q.OrderBy(a => a.AssetNo),
+            "newest"     => q.OrderByDescending(a => a.Created),
+            _            => q.OrderBy(a => a.AssetNo)
         };
 
-        var all = _assetService.GetAssets(SearchTerm, FilterType, FilterProvince, status, null, null, SortBy).ToList();
-        TotalCount = all.Count;
+        // Count + paginate in DB
+        TotalCount = await q.CountAsync();
         TotalPages = (int)Math.Ceiling(TotalCount / (double)PageSize);
         PageNumber = Math.Max(1, Math.Min(PageNumber, Math.Max(1, TotalPages)));
 
-        Assets     = all.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToList();
-        Provinces  = _assetService.GetAllProvinces();
-        AssetTypes = _assetService.GetAllAssetTypes();
-    }
+        var rows = await q.Skip((PageNumber - 1) * PageSize).Take(PageSize).ToListAsync();
 
-    public IActionResult OnPostBook()
-    {
-        if (string.IsNullOrWhiteSpace(CustomerName) || string.IsNullOrWhiteSpace(CustomerPhone))
+        Assets = rows.Select((a, i) => new Asset
         {
-            TempData["Error"] = "กรุณากรอกชื่อและเบอร์โทรศัพท์";
-            return RedirectToPage(GetRouteValues());
-        }
+            Id             = i,
+            AssetDbId      = a.AssetId,
+            AssetCode      = a.AssetNo ?? a.AssetId,
+            AssetType      = a.AssetType ?? "-",
+            TitleDeedType  = a.DeedNo ?? "-",
+            Province       = a.Province ?? "-",
+            District       = a.District ?? "-",
+            SizeText       = a.Size ?? string.Empty,
+            SellingPrice   = decimal.TryParse(a.Price, out var p) ? p : 0m,
+            AppraisedPrice = decimal.TryParse(a.Price, out var p2) ? p2 : 0m,
+            Status         = a.StatusFlg switch
+            {
+                "A" => AssetStatus.Available,
+                "L" => AssetStatus.Locked,
+                "S" => AssetStatus.Sold,
+                _   => AssetStatus.Available
+            },
+            Description = a.AssetName ?? string.Empty,
+            ImgUrl      = a.ImgUrl,
+        }).ToList();
 
-        var booking = _assetService.BookAsset(BookAssetId, CustomerName.Trim(), CustomerPhone.Trim(), CustomerIdCard?.Trim());
-        TempData[booking is not null ? "Success" : "Error"] = booking is not null
-            ? $"จองทรัพย์สำเร็จ! เลขที่การจอง: {booking.BookingNo}"
-            : "ไม่สามารถจองทรัพย์นี้ได้ อาจถูกจองหรือขายไปแล้ว";
+        // Filter dropdowns — distinct values from entire table
+        Provinces  = await _db.AssetMasters.AsNoTracking()
+                        .Where(a => a.Province != null)
+                        .Select(a => a.Province!)
+                        .Distinct().OrderBy(x => x).ToListAsync();
 
-        return RedirectToPage(GetRouteValues());
+        AssetTypes = await _db.AssetMasters.AsNoTracking()
+                        .Where(a => a.AssetType != null)
+                        .Select(a => a.AssetType!)
+                        .Distinct().OrderBy(x => x).ToListAsync();
+
+        return Page();
     }
-
-    private object GetRouteValues() =>
-        new { SearchTerm, FilterType, FilterProvince, FilterStatus, SortBy, PageNumber };
 }

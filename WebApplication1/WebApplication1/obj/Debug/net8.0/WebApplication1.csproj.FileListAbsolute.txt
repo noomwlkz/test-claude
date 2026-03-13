@@ -143,3 +143,5 @@ D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\bin\Debug\net8.
 D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\obj\Debug\net8.0\WebApplication1.csproj.AssemblyReference.cache
 D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\obj\Debug\net8.0\WebAppli.7D14BD69.Up2Date
+D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\obj\Debug\net8.0\WebApplication1.sourcelink.json
+D:\_LSV_Project\Test\Test claude\WebApplication1\WebApplication1\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

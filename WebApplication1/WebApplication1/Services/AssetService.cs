@@ -76,7 +76,7 @@ public class AssetService
 
             var r = rng.Next(100);
             var status = r < 60 ? AssetStatus.Available
-                       : r < 85 ? AssetStatus.Reserved
+                       : r < 85 ? AssetStatus.Locked
                        :           AssetStatus.Sold;
 
             assets.Add(new Asset
@@ -148,7 +148,7 @@ public class AssetService
         var asset = _assets.FirstOrDefault(a => a.Id == assetId && a.Status == AssetStatus.Available);
         if (asset is null) return null;
 
-        asset.Status = AssetStatus.Reserved;
+        asset.Status = AssetStatus.Locked;
 
         var seq = _bookingCounter++;
         var booking = new AssetBooking
@@ -177,7 +177,7 @@ public class AssetService
 
         booking.Status = BookingStatus.Cancelled;
         var asset = _assets.FirstOrDefault(a => a.Id == booking.AssetId);
-        if (asset?.Status == AssetStatus.Reserved)
+        if (asset?.Status == AssetStatus.Locked)
             asset.Status = AssetStatus.Available;
 
         return true;

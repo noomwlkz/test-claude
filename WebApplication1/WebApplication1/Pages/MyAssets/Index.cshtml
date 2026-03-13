@@ -1,0 +1,154 @@
+@page
+@model WebApplication1.Pages.MyAssets.IndexModel
+@{
+    ViewData["Title"] = "ทรัพย์ที่ลงทะเบียน";
+}
+
+<div class="container py-4">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#1565c0,#1a4a8a);
+                        display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;">
+                <i class="bi bi-person-check"></i>
+            </div>
+            <div>
+                <div class="fw-bold fs-5 text-dark">@Model.CustName</div>
+                <div class="text-muted small">ทรัพย์ที่ลงทะเบียนไว้ทั้งหมด @Model.Registrations.Count รายการ</div>
+            </div>
+        </div>
+        <a href="/Assets" class="btn btn-primary">
+            <i class="bi bi-collection me-1"></i>ดูทรัพย์ทั้งหมด
+        </a>
+    </div>
+
+    @if (Model.Registrations.Count == 0)
+    {
+        <!-- Empty state -->
+        <div class="text-center py-5 my-4">
+            <div style="width:80px;height:80px;border-radius:20px;background:#f0f4f8;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:36px;color:#9ca3af;margin:0 auto 20px;">
+                <i class="bi bi-inbox"></i>
+            </div>
+            <h5 class="text-dark fw-semibold mb-2">ยังไม่มีทรัพย์ที่ลงทะเบียน</h5>
+            <p class="text-muted mb-4">เลือกดูทรัพย์และลงทะเบียนความจำนงซื้อได้เลย</p>
+            <a href="/Assets" class="btn btn-primary px-4">
+                <i class="bi bi-search me-1"></i>ค้นหาทรัพย์
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var reg in Model.Registrations)
+            {
+                var statusCls = reg.PresenceFlg switch
+                {
+                    "Y" => ("มาแสดงตัวแล้ว", "success"),
+                    "N" => ("ยังไม่มาแสดงตัว", "warning"),
+                    _   => ("รอดำเนินการ", "secondary")
+                };
+                var addressParts = new[]
+                {
+                    string.IsNullOrWhiteSpace(reg.HouseNo) ? null : $"เลขที่ {reg.HouseNo}",
+                    string.IsNullOrWhiteSpace(reg.Moo) ? null : $"หมู่ {reg.Moo}",
+                    string.IsNullOrWhiteSpace(reg.Road) ? null : $"ถ.{reg.Road}",
+                    string.IsNullOrWhiteSpace(reg.Subdistrict) ? null : $"ต.{reg.Subdistrict}",
+                    string.IsNullOrWhiteSpace(reg.District) ? null : $"อ.{reg.District}",
+                    string.IsNullOrWhiteSpace(reg.Province) ? null : $"จ.{reg.Province}",
+                };
+                var address = string.Join(" ", addressParts.Where(p => p != null));
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="border-radius:16px;overflow:hidden;">
+                        <div class="card-body p-0">
+                            <div class="d-flex flex-wrap">
+
+                                <!-- สี accent ซ้าย -->
+                                <div style="width:6px;background:linear-gradient(180deg,#1565c0,#1a4a8a);flex-shrink:0;"></div>
+
+                                <!-- เนื้อหาหลัก -->
+                                <div class="flex-grow-1 p-4">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                                        <div>
+                                            <div class="d-flex align-items-center gap-2 mb-1">
+                                                <span class="fw-bold text-dark" style="font-size:15px;">
+                                                    @(reg.AssetNo ?? reg.AssetId ?? "-")
+                                                </span>
+                                                @if (!string.IsNullOrWhiteSpace(reg.AssetNum))
+                                                {
+                                                    <span class="text-muted small">· @reg.AssetNum</span>
+                                                }
+                                            </div>
+                                            <div class="text-muted small">
+                                                <i class="bi bi-tag me-1"></i>@(reg.AssetType ?? "-")
+                                                @if (!string.IsNullOrWhiteSpace(reg.AssetName))
+                                                {
+                                                    <span class="ms-2"><i class="bi bi-info-circle me-1"></i>@reg.AssetName</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-@statusCls.Item2 px-3 py-2" style="font-size:12px;border-radius:8px;">
+                                            @statusCls.Item1
+                                        </span>
+                                    </div>
+
+                                    <div class="row g-3 small">
+                                        <!-- ที่ตั้ง -->
+                                        <div class="col-sm-6 col-lg-4">
+                                            <div class="text-muted mb-1"><i class="bi bi-geo-alt me-1 text-danger"></i>ที่ตั้ง</div>
+                                            <div class="fw-semibold text-dark">
+                                                @(string.IsNullOrWhiteSpace(address) ? "-" : address)
+                                            </div>
+                                        </div>
+
+                                        <!-- ขนาด -->
+                                        <div class="col-sm-6 col-lg-2">
+                                            <div class="text-muted mb-1"><i class="bi bi-rulers me-1"></i>ขนาด</div>
+                                            <div class="fw-semibold text-dark">@(reg.Size ?? "-")</div>
+                                        </div>
+
+                                        <!-- ราคา -->
+                                        <div class="col-sm-6 col-lg-3">
+                                            <div class="text-muted mb-1"><i class="bi bi-cash-coin me-1"></i>ราคา</div>
+                                            <div class="fw-bold text-primary" style="font-size:15px;">
+                                                @if (!string.IsNullOrWhiteSpace(reg.Price) && decimal.TryParse(reg.Price, out var p))
+                                                {
+                                                    @($"฿ {p:N0}")
+                                                }
+                                                else
+                                                {
+                                                    @(reg.Price ?? "-")
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <!-- วันที่ลงทะเบียน -->
+                                        <div class="col-sm-6 col-lg-3">
+                                            <div class="text-muted mb-1"><i class="bi bi-calendar3 me-1"></i>วันที่ลงทะเบียน</div>
+                                            <div class="fw-semibold text-dark">
+                                                @(reg.CreateDate.HasValue
+                                                    ? reg.CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+                                                    : "-")
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(reg.DeedNo))
+                                    {
+                                        <div class="mt-3 pt-3 border-top small text-muted">
+                                            <i class="bi bi-file-earmark-text me-1"></i>เลขที่โฉนด: <span class="fw-semibold text-dark">@reg.DeedNo</span>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>

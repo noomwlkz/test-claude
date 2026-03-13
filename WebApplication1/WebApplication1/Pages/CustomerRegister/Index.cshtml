@@ -1,0 +1,221 @@
+@page
+@model WebApplication1.Pages.CustomerRegister.IndexModel
+@{
+    Layout = null;
+    ViewData["Title"] = "ลงทะเบียนผู้ใช้งานใหม่";
+}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ลงทะเบียนผู้ใช้งานใหม่ - ระบบจองซื้อทรัพย์</title>
+    <link rel="stylesheet" href="~/lib/sarabun/sarabun.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0a2342 0%, #1a4a8a 60%, #1565c0 100%);
+            display: flex; align-items: center; justify-content: center;
+            padding: 32px 16px;
+        }
+        .reg-card {
+            background: #fff;
+            border-radius: 24px;
+            width: 100%; max-width: 620px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+        }
+        .reg-header {
+            background: linear-gradient(135deg, #0a2342, #1565c0);
+            padding: 32px 40px 28px;
+            display: flex; align-items: center; gap: 18px;
+        }
+        .reg-header-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255,255,255,0.15);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; color: #fff; flex-shrink: 0;
+        }
+        .reg-header-title { color: #fff; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .reg-header-sub   { color: rgba(255,255,255,0.7); font-size: 13px; }
+
+        .reg-body { padding: 36px 40px; }
+
+        .section-label {
+            font-size: 11px; font-weight: 700; letter-spacing: 1px;
+            color: #9ca3af; text-transform: uppercase;
+            margin-bottom: 14px; padding-bottom: 8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .form-label-sm {
+            font-size: 13px; font-weight: 600; color: #374151;
+            margin-bottom: 5px; display: block;
+        }
+        .required { color: #ef4444; }
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            color: #9ca3af; font-size: 15px; pointer-events: none;
+        }
+        .fc {
+            width: 100%; height: 46px;
+            border: 1.5px solid #e5e7eb; border-radius: 10px;
+            padding: 0 14px 0 40px;
+            font-size: 14px; font-family: 'Sarabun', sans-serif;
+            color: #111827; background: #f9fafb;
+            transition: border-color .2s, box-shadow .2s; outline: none;
+        }
+        .fc:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21,101,192,0.12);
+            background: #fff;
+        }
+        .fc.readonly { background: #f3f4f6; color: #6b7280; cursor: not-allowed; }
+        .fc-select { padding-left: 40px; cursor: pointer; }
+        .fc-textarea {
+            height: auto; padding: 10px 14px 10px 40px;
+            resize: vertical; min-height: 80px;
+        }
+
+        .error-box {
+            background: #fef2f2; border: 1px solid #fecaca;
+            border-radius: 10px; padding: 12px 16px;
+            color: #dc2626; font-size: 13px;
+            display: flex; gap: 10px; margin-bottom: 20px;
+        }
+        .btn-submit {
+            width: 100%; height: 52px; border-radius: 12px;
+            background: linear-gradient(135deg, #1565c0, #1a4a8a);
+            border: none; color: #fff; font-size: 16px; font-weight: 600;
+            font-family: 'Sarabun', sans-serif; cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 24px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(21,101,192,0.35);
+        }
+        .back-link {
+            display: block; text-align: center; margin-top: 16px;
+            font-size: 13px; color: #6b7280; text-decoration: none;
+        }
+        .back-link:hover { color: #1565c0; }
+    </style>
+</head>
+<body>
+<div class="reg-card">
+
+    <!-- Header -->
+    <div class="reg-header">
+        <div class="reg-header-icon"><i class="bi bi-person-plus"></i></div>
+        <div>
+            <div class="reg-header-title">ลงทะเบียนผู้ใช้งานใหม่</div>
+            <div class="reg-header-sub">กรอกข้อมูลส่วนตัวเพื่อสมัครใช้งานระบบ</div>
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="reg-body">
+
+        @if (!ModelState.IsValid && ModelState.ErrorCount > 0)
+        {
+            <div class="error-box">
+                <i class="bi bi-exclamation-circle-fill flex-shrink-0 mt-1"></i>
+                <div>
+                    @foreach (var err in ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@err.ErrorMessage</div>
+                    }
+                </div>
+            </div>
+        }
+
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Phone"  value="@Model.Phone" />
+            <input type="hidden" name="IdCard" value="@Model.IdCard" />
+
+            <!-- ข้อมูลการเข้าสู่ระบบ (read-only) -->
+            <div class="section-label">ข้อมูลการเข้าสู่ระบบ</div>
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <label class="form-label-sm">เบอร์โทรศัพท์</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-phone input-icon"></i>
+                        <input type="text" class="fc readonly" value="@Model.Phone" readonly />
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="form-label-sm">เลขบัตรประชาชน</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-credit-card-2-front input-icon"></i>
+                        <input type="text" class="fc readonly" value="@Model.IdCard" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ข้อมูลส่วนตัว -->
+            <div class="section-label">ข้อมูลส่วนตัว</div>
+            <div class="row g-3 mb-4">
+                <div class="col-sm-3">
+                    <label class="form-label-sm">คำนำหน้า <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-person input-icon"></i>
+                        <select name="Title_" class="fc fc-select" required>
+                            <option value="">-- เลือก --</option>
+                            @foreach (var t in new[] { "นาย", "นาง", "นางสาว", "ด.ช.", "ด.ญ." })
+                            {
+                                <option value="@t" selected="@(Model.Title_ == t ? "selected" : null)">@t</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <label class="form-label-sm">ชื่อ <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-type input-icon"></i>
+                        <input type="text" name="Name" value="@Model.Name" class="fc"
+                               placeholder="ชื่อจริง" required />
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <label class="form-label-sm">นามสกุล <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="bi bi-type input-icon"></i>
+                        <input type="text" name="Surname" value="@Model.Surname" class="fc"
+                               placeholder="นามสกุล" required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ที่อยู่ -->
+            <div class="section-label">ที่อยู่</div>
+            <div class="mb-3">
+                <label class="form-label-sm">ที่อยู่</label>
+                <div class="input-wrap">
+                    <i class="bi bi-house input-icon" style="top:18px;transform:none;"></i>
+                    <textarea name="Address" class="fc fc-textarea"
+                              placeholder="บ้านเลขที่ ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด รหัสไปรษณีย์">@Model.Address</textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="bi bi-check-circle"></i> ยืนยันลงทะเบียน
+            </button>
+        </form>
+
+        <a href="/Login" class="back-link">
+            <i class="bi bi-arrow-left me-1"></i>กลับหน้าเข้าสู่ระบบ
+        </a>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

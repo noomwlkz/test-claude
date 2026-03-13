@@ -3,6 +3,7 @@ namespace WebApplication1.Models;
 public class Asset
 {
     public int Id { get; set; }
+    public string AssetDbId { get; set; } = string.Empty;
     public string AssetCode { get; set; } = string.Empty;
     public string AssetType { get; set; } = string.Empty;
     public string TitleDeedType { get; set; } = string.Empty;
@@ -15,6 +16,8 @@ public class Asset
     public decimal SellingPrice { get; set; }
     public AssetStatus Status { get; set; } = AssetStatus.Available;
     public string Description { get; set; } = string.Empty;
+    public string SizeText { get; set; } = string.Empty;
+    public string? ImgUrl { get; set; }
 
     public string TypeCssClass => AssetType switch
     {
@@ -43,7 +46,7 @@ public class Asset
     public string StatusText => Status switch
     {
         AssetStatus.Available => "ว่าง",
-        AssetStatus.Reserved  => "จอง",
+        AssetStatus.Locked    => "ล็อค",
         AssetStatus.Sold      => "ขายแล้ว",
         _                     => "ไม่ทราบ"
     };
@@ -51,7 +54,7 @@ public class Asset
     public string StatusBadgeClass => Status switch
     {
         AssetStatus.Available => "badge-available",
-        AssetStatus.Reserved  => "badge-reserved",
+        AssetStatus.Locked    => "badge-reserved",
         AssetStatus.Sold      => "badge-sold",
         _                     => "badge-secondary"
     };
@@ -60,6 +63,7 @@ public class Asset
     {
         get
         {
+            if (!string.IsNullOrWhiteSpace(SizeText)) return SizeText;
             if (AssetType == "คอนโดมิเนียม") return $"{AreaWa:0.##} ตร.ม.";
             var parts = new List<string>();
             if (AreaRai > 0)  parts.Add($"{AreaRai:0.##} ไร่");
@@ -73,6 +77,6 @@ public class Asset
 public enum AssetStatus
 {
     Available = 0,
-    Reserved  = 1,
+    Locked    = 1,
     Sold      = 2
 }

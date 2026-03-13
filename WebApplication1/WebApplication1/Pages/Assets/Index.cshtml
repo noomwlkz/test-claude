@@ -120,10 +120,10 @@
                                 <span style="color:#2E7D32">● ว่าง</span>
                             </label>
                             <label class="filter-option">
-                                <input type="radio" name="FilterStatus" value="reserved"
-                                       @(Model.FilterStatus == "reserved" ? "checked" : "")
+                                <input type="radio" name="FilterStatus" value="locked"
+                                       @(Model.FilterStatus == "locked" ? "checked" : "")
                                        onchange="this.form.submit()" />
-                                <span style="color:#E65100">● จอง</span>
+                                <span style="color:#E65100">● ล็อค</span>
                             </label>
                             <label class="filter-option">
                                 <input type="radio" name="FilterStatus" value="sold"
@@ -203,11 +203,24 @@
                     {
                         <div class="col">
                             <div class="asset-card">
-                                <!-- Color header -->
-                                <div class="asset-card-header @asset.TypeCssClass">
-                                    <span class="asset-code-badge">@asset.AssetCode</span>
-                                    <span class="asset-status-badge @asset.StatusBadgeClass">@asset.StatusText</span>
-                                </div>
+                                <!-- Image / Color header -->
+                                @if (!string.IsNullOrWhiteSpace(asset.ImgUrl))
+                                {
+                                    <div class="asset-card-header position-relative p-0 overflow-hidden" style="height:140px">
+                                        <img src="@asset.ImgUrl" alt="@asset.AssetCode"
+                                             style="width:100%;height:100%;object-fit:cover;"
+                                             onerror="this.parentElement.classList.add('@asset.TypeCssClass');this.remove()">
+                                        <span class="asset-code-badge" style="position:absolute;top:8px;left:8px">@asset.AssetCode</span>
+                                        <span class="asset-status-badge @asset.StatusBadgeClass" style="position:absolute;top:8px;right:8px">@asset.StatusText</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="asset-card-header @asset.TypeCssClass">
+                                        <span class="asset-code-badge">@asset.AssetCode</span>
+                                        <span class="asset-status-badge @asset.StatusBadgeClass">@asset.StatusText</span>
+                                    </div>
+                                }
                                 <!-- Body -->
                                 <div class="asset-card-body">
                                     <div class="asset-type-row">
@@ -229,10 +242,9 @@
                                     </div>
                                     @if (asset.Status == AssetStatus.Available)
                                     {
-                                        <button type="button" class="btn-book"
-                                                onclick="openBookingModal(@asset.Id,'@asset.AssetCode','@asset.AssetType','@asset.District, @asset.Province',@asset.SellingPrice)">
-                                            <i class="bi bi-bookmark-plus me-1"></i>จองซื้อ
-                                        </button>
+                                        <a href="/Register?assetId=@asset.AssetDbId" class="btn-book d-block text-center text-decoration-none">
+                                            <i class="bi bi-clipboard2-check me-1"></i>ลงทะเบียนซื้อ
+                                        </a>
                                     }
                                     else
                                     {
@@ -344,75 +356,3 @@
     </div>
 </div>
 
-<!-- ── Booking Modal ── -->
-<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header booking-modal-header">
-                <h5 class="modal-title" id="bookingModalLabel">
-                    <i class="bi bi-bookmark-plus me-2"></i>จองซื้อทรัพย์
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" asp-page-handler="Book">
-                <div class="modal-body p-4">
-                    <!-- Asset preview -->
-                    <div class="booking-asset-preview mb-4">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="booking-asset-icon">
-                                <i class="bi bi-house-door fs-4"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold fs-6" id="modalAssetCode">-</div>
-                                <div class="text-muted small" id="modalAssetType">-</div>
-                                <div class="text-muted small" id="modalAssetLocation">-</div>
-                                <div class="fw-bold mt-1" style="color:var(--primary);font-size:1.15rem" id="modalAssetPrice">-</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <input type="hidden" asp-for="BookAssetId" id="bookAssetId" />
-
-                    <div class="mb-3">
-                        <label class="form-label">ชื่อ-นามสกุล <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" asp-for="CustomerName"
-                               placeholder="กรอกชื่อ-นามสกุล" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
-                        <input type="tel" class="form-control" asp-for="CustomerPhone"
-                               placeholder="0xx-xxx-xxxx" required />
-                    </div>
-                    <div class="mb-1">
-                        <label class="form-label">เลขบัตรประชาชน <span class="text-muted fw-normal">(ไม่บังคับ)</span></label>
-                        <input type="text" class="form-control" asp-for="CustomerIdCard"
-                               placeholder="x-xxxx-xxxxx-xx-x" maxlength="17" />
-                    </div>
-                </div>
-                <div class="modal-footer border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">ยกเลิก</button>
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="bi bi-bookmark-check me-1"></i>ยืนยันการจอง
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        function openBookingModal(assetId, assetCode, assetType, location, price) {
-            document.getElementById('bookAssetId').value = assetId;
-            document.getElementById('modalAssetCode').textContent = assetCode;
-            document.getElementById('modalAssetType').textContent = assetType;
-            document.getElementById('modalAssetLocation').textContent = location;
-            document.getElementById('modalAssetPrice').textContent =
-                '฿ ' + Number(price).toLocaleString('th-TH');
-            document.querySelector('[name="CustomerName"]').value = '';
-            document.querySelector('[name="CustomerPhone"]').value = '';
-            document.querySelector('[name="CustomerIdCard"]').value = '';
-            new bootstrap.Modal(document.getElementById('bookingModal')).show();
-        }
-    </script>
-}

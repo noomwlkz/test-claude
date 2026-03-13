@@ -1,0 +1,205 @@
+@page
+@model WebApplication1.Pages.Register.IndexModel
+@{
+    ViewData["Title"] = "ลงทะเบียนซื้อทรัพย์";
+    var asset = Model.Asset!;
+
+    // สร้าง string ที่อยู่เต็ม
+    var addressParts = new[]
+    {
+        string.IsNullOrWhiteSpace(asset.HouseNo) ? null : $"เลขที่ {asset.HouseNo}",
+        string.IsNullOrWhiteSpace(asset.Moo) ? null : $"หมู่ {asset.Moo}",
+        string.IsNullOrWhiteSpace(asset.Soi) ? null : $"ซอย{asset.Soi}",
+        string.IsNullOrWhiteSpace(asset.Road) ? null : $"ถ.{asset.Road}",
+        string.IsNullOrWhiteSpace(asset.Subdistrict) ? null : $"ต.{asset.Subdistrict}",
+        string.IsNullOrWhiteSpace(asset.District) ? null : $"อ.{asset.District}",
+        string.IsNullOrWhiteSpace(asset.Province) ? null : $"จ.{asset.Province}",
+    };
+    var fullAddress = string.Join(" ", addressParts.Where(p => p != null));
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item"><a href="/Assets">รายการทรัพย์</a></li>
+            <li class="breadcrumb-item active">ลงทะเบียนซื้อทรัพย์</li>
+        </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-clipboard2-check fs-3 text-primary"></i>
+        <div>
+            <h4 class="mb-0 fw-bold">ลงทะเบียนซื้อทรัพย์</h4>
+            <small class="text-muted">กรุณาตรวจสอบรายละเอียดทรัพย์ก่อนยืนยัน</small>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- คอลัมน์ซ้าย: รูปภาพ + ข้อมูลหลัก -->
+        <div class="col-lg-5">
+
+            <!-- รูปภาพทรัพย์ -->
+            <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+                @if (!string.IsNullOrWhiteSpace(asset.ImgUrl))
+                {
+                    <img src="@asset.ImgUrl" alt="@asset.AssetName"
+                         class="card-img-top" style="height:260px; object-fit:cover;">
+                }
+                else
+                {
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height:260px;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-image fs-1"></i>
+                            <div class="mt-2 small">ไม่มีรูปภาพ</div>
+                        </div>
+                    </div>
+                }
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge bg-secondary mb-1">@(asset.AssetType ?? "-")</span>
+                            <h5 class="fw-bold mb-1">@(asset.AssetName ?? "-")</h5>
+                            <div class="text-muted small">
+                                <i class="bi bi-upc me-1"></i>รหัส: <strong>@(asset.AssetNo ?? asset.AssetId)</strong>
+                            </div>
+                        </div>
+                        @{
+                            var statusText = asset.StatusFlg switch
+                            {
+                                "A" => ("ว่าง",    "success"),
+                                "L" => ("ล็อค",    "warning"),
+                                "S" => ("ขายแล้ว", "danger"),
+                                _   => (asset.StatusFlg ?? "-", "secondary")
+                            };
+                        }
+                        <span class="badge bg-@statusText.Item2">@statusText.Item1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ราคา -->
+            <div class="card border-0 shadow-sm border-start border-4 border-primary">
+                <div class="card-body">
+                    <div class="text-muted small mb-1">ราคาทรัพย์</div>
+                    <div class="fs-4 fw-bold text-primary">
+                        @if (!string.IsNullOrWhiteSpace(asset.Price) && decimal.TryParse(asset.Price, out var price))
+                        {
+                            @price.ToString("N2") <span class="fs-6 fw-normal">บาท</span>
+                        }
+                        else
+                        {
+                            @(asset.Price ?? "-")
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- คอลัมน์ขวา: รายละเอียด + ที่ตั้ง -->
+        <div class="col-lg-7">
+
+            <!-- ข้อมูลทรัพย์ -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-info-circle text-primary me-2"></i>ข้อมูลทรัพย์
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-5 text-muted fw-normal">รหัสทรัพย์</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.AssetNo ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">หมายเลขทรัพย์</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.AssetNum ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">ประเภทรนัพย์</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.AssetType ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">ชื่อ / รายละเอียด</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.AssetName ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">ขนาด</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.Size ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">เลขที่โฉนด</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.DeedNo ?? "-")</dd>
+
+                        @if (!string.IsNullOrWhiteSpace(asset.Tel))
+                        {
+                            <dt class="col-sm-5 text-muted fw-normal">โทรศัพท์</dt>
+                            <dd class="col-sm-7 fw-semibold">@asset.Tel</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <!-- ที่ตั้งทรัพย์ -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-geo-alt text-danger me-2"></i>ที่ตั้งทรัพย์
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-2 small">
+                        <dt class="col-sm-5 text-muted fw-normal">บ้านเลขที่</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.HouseNo ?? "-")</dd>
+
+                        @if (!string.IsNullOrWhiteSpace(asset.Moo))
+                        {
+                            <dt class="col-sm-5 text-muted fw-normal">หมู่ที่</dt>
+                            <dd class="col-sm-7 fw-semibold">@asset.Moo</dd>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(asset.Soi))
+                        {
+                            <dt class="col-sm-5 text-muted fw-normal">ซอย</dt>
+                            <dd class="col-sm-7 fw-semibold">@asset.Soi</dd>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(asset.Road))
+                        {
+                            <dt class="col-sm-5 text-muted fw-normal">ถนน</dt>
+                            <dd class="col-sm-7 fw-semibold">@asset.Road</dd>
+                        }
+
+                        <dt class="col-sm-5 text-muted fw-normal">ตำบล/แขวง</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.Subdistrict ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">อำเภอ/เขต</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.District ?? "-")</dd>
+
+                        <dt class="col-sm-5 text-muted fw-normal">จังหวัด</dt>
+                        <dd class="col-sm-7 fw-semibold">@(asset.Province ?? "-")</dd>
+                    </dl>
+
+                    @if (!string.IsNullOrWhiteSpace(fullAddress))
+                    {
+                        <div class="alert alert-light border small mb-0 py-2">
+                            <i class="bi bi-pin-map me-1 text-danger"></i>
+                            @fullAddress
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- ปุ่มดำเนินการ -->
+            <div class="d-flex gap-2">
+                <a href="/Assets" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>กลับ
+                </a>
+                <button type="button" class="btn btn-primary flex-grow-1"
+                        @(asset.StatusFlg == "A" ? "" : "disabled")>
+                    <i class="bi bi-clipboard2-check me-1"></i>
+                    @(asset.StatusFlg == "A" ? "ยืนยันลงทะเบียนซื้อทรัพย์"
+                    : asset.StatusFlg == "L" ? "ทรัพย์นี้ถูกล็อคแล้ว"
+                    : "ทรัพย์นี้ขายแล้ว")
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
